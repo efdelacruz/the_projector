@@ -3,12 +3,16 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="Persons")
+ * @UniqueEntity(fields="username", message="This username is already in use")
  */
-class Person
+class Person implements UserInterface
 {
   /**
    * @ORM\Column(type="integer")
@@ -28,7 +32,7 @@ class Person
   private $first_name;
 
   /**
-   * @ORM\Column(type="string", length=50)
+   * @ORM\Column(type="string", length=50, unique=true)
    */
   private $username;
 
@@ -50,7 +54,7 @@ class Person
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -73,7 +77,7 @@ class Person
     /**
      * Get last_name
      *
-     * @return string 
+     * @return string
      */
     public function getLastName()
     {
@@ -96,7 +100,7 @@ class Person
     /**
      * Get first_name
      *
-     * @return string 
+     * @return string
      */
     public function getFirstName()
     {
@@ -119,7 +123,7 @@ class Person
     /**
      * Get username
      *
-     * @return string 
+     * @return string
      */
     public function getUsername()
     {
@@ -142,7 +146,7 @@ class Person
     /**
      * Get password
      *
-     * @return string 
+     * @return string
      */
     public function getPassword()
     {
@@ -175,10 +179,25 @@ class Person
     /**
      * Get project_assignments
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getProjectAssignments()
     {
         return $this->project_assignments;
+    }
+
+    public function eraseCredentials()
+    {
+        return null;
+    }
+
+    public function getRoles()
+    {
+        return [$this->getRole()];
+    }
+
+    public function getSalt()
+    {
+        return null;
     }
 }

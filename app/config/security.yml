@@ -3,9 +3,18 @@
 security:
 
     # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    encoders:
+        AppBundle\Entity\Person: bcrypt
+        Symfony\Component\Security\Core\User\User: plaintext
     providers:
         in_memory:
-            memory: ~
+            memory:
+                users: # or persons: ?
+                    admin:
+                        password: netzwelt
+                        roles: 'ROLE_ADMIN'
+        #database_users:
+        #    entity: { class: AppBundle:Person, property: username }
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -22,3 +31,10 @@ security:
 
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
             #form_login: ~
+
+            guard:
+                authenticators:
+                    - app.form_login_authenticator
+            logout:
+                path: /projector/logout
+                target: /home
