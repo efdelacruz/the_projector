@@ -38,3 +38,7 @@ security:
             logout:
                 path: /projector/logout
                 target: /projector/login
+
+        secured_area:
+            form_login:
+                csrf_token_generator: security.csrf.token_manager
