@@ -37,4 +37,4 @@ security:
                     - app.form_login_authenticator
             logout:
                 path: /projector/logout
-                target: /home
+                target: /projector/login
