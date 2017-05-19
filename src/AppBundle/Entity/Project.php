@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -19,6 +21,7 @@ class Project
 
   /**
    * @ORM\Column(type="string", length=50)
+   * @Assert\NotBlank()
    */
   private $code;
 
@@ -50,7 +53,7 @@ class Project
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -73,7 +76,7 @@ class Project
     /**
      * Get code
      *
-     * @return string 
+     * @return string
      */
     public function getCode()
     {
@@ -96,7 +99,7 @@ class Project
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -119,7 +122,7 @@ class Project
     /**
      * Get remarks
      *
-     * @return string 
+     * @return string
      */
     public function getRemarks()
     {
@@ -142,7 +145,7 @@ class Project
     /**
      * Get budget
      *
-     * @return string 
+     * @return string
      */
     public function getBudget()
     {
@@ -175,7 +178,7 @@ class Project
     /**
      * Get project_assignments
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getProjectAssignments()
     {

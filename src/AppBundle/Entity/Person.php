@@ -33,11 +33,23 @@ class Person implements UserInterface
 
   /**
    * @ORM\Column(type="string", length=50, unique=true)
+   * @Assert\Length(
+   *    min = 5,
+   *    max = 200,
+   *    minMessage = "Your username must be at least {{ limit }} characters long",
+   *    maxMessage = "Your username cannot be longer than {{ limit }} characters"
+   * )
    */
   private $username;
 
   /**
    * @ORM\Column(type="string", length=50)
+   * @Assert\Length(
+   *    min = 7,
+   *    max = 11,
+   *    minMessage = "Your password must be at least {{ limit }} characters long",
+   *    maxMessage = "Your password cannot be longer than {{ limit }} characters"
+   * )
    */
   private $password;
 
