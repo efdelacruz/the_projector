@@ -42,3 +42,7 @@ security:
         secured_area:
             form_login:
                 csrf_token_generator: security.csrf.token_manager
+
+    access_control:
+            - { path: ^/projector/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+            - { path: ^/, role: ROLE_ADMIN }
