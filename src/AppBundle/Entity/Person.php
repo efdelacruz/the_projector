@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -50,8 +51,18 @@ class Person implements UserInterface
    *    minMessage = "Your password must be at least {{ limit }} characters long",
    *    maxMessage = "Your password cannot be longer than {{ limit }} characters"
    * )
+   * @Assert\Regex(
+   *    pattern="/^\S{6,}$/",
+   *    match=true,
+   *    message="Password cannot contain spaces"
+   * )
    */
   private $password;
+
+  /**
+   * @ORM\Column(type="string", length=50)
+  */
+  protected $role;
 
   /**
    * @ORM\OneToMany(targetEntity="ProjectAssignment", mappedBy="person")
@@ -163,6 +174,29 @@ class Person implements UserInterface
     public function getPassword()
     {
         return $this->password;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     * @return Person
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 
     /**
