@@ -10,11 +10,13 @@ security:
         in_memory:
             memory:
                 users: # or persons: ?
-                    admin:
+                    admin@mail.com:
                         password: netzwelt
                         roles: 'ROLE_ADMIN'
-        #database_users:
-        #    entity: { class: AppBundle:Person, property: username }
+        our_db_provider:
+            entity:
+                class: AppBundle:Person
+                property: username
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -27,7 +29,7 @@ security:
             # activate different ways to authenticate
 
             # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-            #http_basic: ~
+            http_basic: ~
 
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
             #form_login: ~
@@ -42,3 +44,8 @@ security:
         secured_area:
             form_login:
                 csrf_token_generator: security.csrf.token_manager
+
+    access_control:
+            - { path: ^/projector/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+            - { path: ^/, role: ROLE_ADMIN }
+            - { path: ^/, role: ROLE_USER }
