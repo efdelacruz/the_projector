@@ -22,4 +22,12 @@ class HomeController extends Controller
       'test_str' => $test_str,
     ));
   }
+
+  /*
+   *  @Route("/projector", name="signin")
+   */
+  public function signin()
+  {
+    return $this->render('auth/login.html.twig');
+  }
 }
