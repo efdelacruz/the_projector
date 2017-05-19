@@ -11,11 +11,12 @@ class PersonProvider implements UserProviderInterface
 {
     public function loadUserByUsername($username)
     {
-        $userData = ...
+        $em = $this->getDoctrine()->getManager();
+        $userData = $em->getRepository('AppBundle:Person')->findByUsername($username);
         // pretend it returns an array on success, false if there is no user
 
         if ($userData) {
-            $password = '...';
+            $password = $userData->getPassword();
 
 
             return new Person($username, $password, $roles);
@@ -28,7 +29,7 @@ class PersonProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user)
     {
-        if (!$user instanceof WebserviceUser) {
+        if (!$user instanceof Person) {
             throw new UnsupportedUserException(
                 sprintf('Instances of "%s" are not supported.', get_class($user))
             );

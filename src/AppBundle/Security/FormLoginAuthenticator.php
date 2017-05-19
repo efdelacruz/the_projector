@@ -5,7 +5,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -13,13 +13,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Core\Security;
+use AppBundle\Security\PersonProvider;
 
 class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
 {
     private $router;
     private $encoder;
 
-    public function __construct(RouterInterface $router, UserPasswordEncoder $encoder)
+    public function __construct(RouterInterface $router, UserPasswordEncoderInterface $encoder)
     {
         $this->router = $router;
         $this->encoder = $encoder;
@@ -41,7 +42,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         ];
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, PersonProvider $userProvider)
     {
         $username = $credentials['username'];
 

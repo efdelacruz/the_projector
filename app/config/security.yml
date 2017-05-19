@@ -7,12 +7,14 @@ security:
         AppBundle\Entity\Person: bcrypt
         Symfony\Component\Security\Core\User\User: plaintext
     providers:
-        #in_memory:
-        #    memory:
-        #        users: # or persons: ?
-        #            admin@mail.com:
-        #                password: netzwelt
-        #                roles: 'ROLE_ADMIN'
+        person:
+          id: app.person_provider
+        in_memory:
+            memory:
+                users: # or persons: ?
+                    admin@mail.com:
+                        password: netzwelt
+                        roles: 'ROLE_ADMIN'
         our_db_provider:
             entity:
                 class: AppBundle:Person
