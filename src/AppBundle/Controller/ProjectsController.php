@@ -8,10 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class ProjectsController extends Controller
 {
@@ -49,7 +45,7 @@ class ProjectsController extends Controller
       $em = $this->getDoctrine()->getManager();
       $em->persist($project);
       $em->flush();
-      
+
       $this->addFlash(
         'notice',
         'Succesfully created project!'
