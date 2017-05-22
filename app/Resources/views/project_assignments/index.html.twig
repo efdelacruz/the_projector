@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    {% for flash_message in app.session.flashBag.get('notice') %}
+      <div class="flash-notice">
+        {{ flash_message }}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="row">
+    <div class="col-md-offset-1">
+      <div class="col-md-6 col-md-offset-1">
+        <h3>{{ project_name }}</h3>
+        <form class="form-horizontal" role="form" method="POST" action="{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}">
+          <div class="row">
+            <input type="hidden" name="project_id" value="{{ project_id }}">
+            <div class="form-group">
+              <div class="col-md-7 col-md-offset-1">
+                <label for="sel1"></label>
+                <select class="form-control" id="sel1" name="person_id">
+                  {% for unassigned in project_unassigned_list %}
+                    <option value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-3 col-md-offset-1">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-btn fa-user"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+        {% if project_assignments is null or project_assignments is empty %}
+          <div class="row">
+            <div class="col-md-8 col-md-offset-4">
+              <h4>No assignments yet</h4>
+            </div>
+          </div>
+        {% else %}
+          <table class="table table-hover table-responsive">
+            <thead>
+              <tr>
+                <th>Current Members</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for project_assignment in project_assignments %}
+              <tr>
+                <td>{{ project_assignment.id }} {{ project_assignment.first_name }} {{ project_assignment.last_name}}</td>
+                <td><a href="{{ path('unassign_person', {'project_id':project_id,'project_name':project_name, 'person_id':project_assignment.id}) }}">{{ 'Remove'|trans }}</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+    <div class="col-md-3 col-md-offset-1">
+    </div>
+  </div>
+</div>
+
+{% endblock %}
