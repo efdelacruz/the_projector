@@ -17,6 +17,7 @@
           $("#result").text(JSON.stringify(jsonStr));
         }
       });
+      return false;
     });
   });
 </script>
@@ -32,6 +33,9 @@
     <div class="col-md-offset-1">
       <div class="col-md-6 col-md-offset-1">
         <h3>{{ project_name }}</h3>
+
+        {% if project_unassigned_list is null or project_unassigned_list is empty %}
+        {% else %}
         <form class="form-horizontal" role="form" method="POST" action="#">
           <div class="row">
             <input id="project" type="hidden" name="project_id" value="{{ project_id }}">
@@ -54,6 +58,8 @@
             </div>
           </div>
         </form>
+        {% endif %}
+
         {% if project_assignments is null or project_assignments is empty %}
           <div class="row">
             <div class="col-md-8 col-md-offset-4">
