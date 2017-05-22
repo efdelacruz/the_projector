@@ -62,21 +62,26 @@ class ProjectAssignmentsController extends Controller
    */
   public function unassignPersonFromProject(Request $request, $project_id)
   {
-    $request->isXmlHttpRequest();
-    $person_id = $request->query->get('person_id');
-    $project_name = $request->query->get('project_name');
-    $conn = $this->get('database_connection');
+    if ($request->isXmlHttpRequest())
+    {
+      return new Response();
+    }
+    else {
+      $person_id = $request->query->get('person_id');
+      $project_name = $request->query->get('project_name');
+      $conn = $this->get('database_connection');
 
-    $assignments_service = new AssignmentsService();
+      $assignments_service = new AssignmentsService();
 
-    $assignments_service->removePersonFromProject($project_id, $person_id, $conn);
-    $ret = $assignments_service->getAssignedPersonsOnProject($project_id, $conn);
+      $assignments_service->removePersonFromProject($project_id, $person_id, $conn);
+      $ret = $assignments_service->getAssignedPersonsOnProject($project_id, $conn);
 
-    return $this->render('project_assignments/index.html.twig', array(
-      'project_assignments' => $ret["assigned_list"],
-      'project_unassigned_list' => $ret["unassigned_list"],
-      'project_id' => $project_id,
-      'project_name' => $project_name
-    ));
+      return $this->render('project_assignments/index.html.twig', array(
+        'project_assignments' => $ret["assigned_list"],
+        'project_unassigned_list' => $ret["unassigned_list"],
+        'project_id' => $project_id,
+        'project_name' => $project_name
+      ));
+    }
   }
 }

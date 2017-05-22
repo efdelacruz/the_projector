@@ -1,7 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#submit").click(function(){
+      $.ajax({
+        url: "{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}",
+        type: "POST",
+        data: {
+          project_id: $("#project").val(),
+          person_id: $("#person").val()
+        },
+        dataType: "JSON",
+        success: function (jsonStr) {
+          $("#result").text(JSON.stringify(jsonStr));
+        }
+      });
+    });
+  });
+</script>
 <div class="container">
   <div class="row">
     {% for flash_message in app.session.flashBag.get('notice') %}
@@ -14,13 +32,13 @@
     <div class="col-md-offset-1">
       <div class="col-md-6 col-md-offset-1">
         <h3>{{ project_name }}</h3>
-        <form class="form-horizontal" role="form" method="POST" action="{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}">
+        <form class="form-horizontal" role="form" method="POST" action="#">
           <div class="row">
-            <input type="hidden" name="project_id" value="{{ project_id }}">
+            <input id="project" type="hidden" name="project_id" value="{{ project_id }}">
             <div class="form-group">
               <div class="col-md-7 col-md-offset-1">
-                <label for="sel1"></label>
-                <select class="form-control" id="sel1" name="person_id">
+                <label for="person"></label>
+                <select class="form-control" id="person" name="person_id">
                   {% for unassigned in project_unassigned_list %}
                     <option value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
                   {% endfor %}
@@ -29,7 +47,7 @@
             </div>
             <div class="form-group">
               <div class="col-md-3 col-md-offset-1">
-                <button type="submit" class="btn btn-primary">
+                <button id="submit" type="submit" class="btn btn-primary">
                   <i class="fa fa-btn fa-user"></i> Add
                 </button>
               </div>
