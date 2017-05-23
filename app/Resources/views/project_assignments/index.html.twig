@@ -23,7 +23,7 @@
           var length = $('#person').children('option').length;
           var person = $.parseJSON(response);
 
-          tblDiv.append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>');
+          tblDiv.append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>')
           i++;
 
           $("#unassigned-option-"+person.id).remove();
@@ -44,6 +44,8 @@ $(document).ready(function() {
   var i = $('#assignments tr').size() + 1;
 
   $(".remove-button").click(function(){
+    var $tr = $(this).closest('tr');
+
     $.ajax({
       url: "{{ path('unassign_person', {'project_id':project_id}) }}",
       type: "POST",
@@ -51,16 +53,25 @@ $(document).ready(function() {
         project_id: $("#project").val(),
         person_id: $(this).attr('data-row-id')
       },
-      //dataType: "JSON",
+      dataType: "JSON",
       error: function (request, status, error) {
         console.log(error);
       },
       success: function (response) {
-        alert("RESP DEL" + response)
+        var length = $('#person').children('option').length;
         var person = $.parseJSON(response);
-        var rowToDelete = $('td[data-row-id=person.id]');
-        $(rowToDelete).parent().remove(rowToDelete);
+
+        $tr.find('td').fadeOut(300,function(){
+          $tr.remove();
+        });
         i--;
+
+        $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
+        length++;
+
+        if(length>0){
+          $("#add-person-div").show();
+        }
       }
     })
     return false;

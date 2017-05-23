@@ -45,23 +45,12 @@ class AssignmentsService
     $stmt->execute();
   }
 
-  public function getLastAssignedPerson($person_id, $conn){
+  public function getLastMovedPerson($person_id, $conn){
     $sql = "SELECT Persons.first_name, Persons.last_name FROM Persons WHERE id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->bindValue("id", $person_id);
     $stmt->execute();
 
     return $stmt->fetch();
-  }
-
-  public function getLastUnassignedPersonOnProject($project_id, $person_id, $conn){
-    //$sql = "SELECT Persons.id, Persons.first_name,
-    //  Persons.last_name FROM ProjectAssignments INNER JOIN Persons
-    //  ON ProjectAssignments.person_id = Persons.id WHERE project_id = :project_id
-    //  AND person_id = :person_id";
-    $stmt = $conn->prepare($sql);
-    //$stmt->bindValue("project_id", $project_id);
-    //$stmt->bindValue("person_id", $person_id);
-    $stmt->execute();
   }
 }
