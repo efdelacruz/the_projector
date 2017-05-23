@@ -44,6 +44,7 @@ $(document).ready(function() {
   var i = $('#assignments tr').size() + 1;
 
   $(".remove-button").click(function(){
+  //$(document).on("click",".remove-button",function(e)){
     var $tr = $(this).closest('tr');
 
     $.ajax({
