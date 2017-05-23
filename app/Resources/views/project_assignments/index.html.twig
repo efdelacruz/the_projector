@@ -4,6 +4,9 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+    var tblDiv = $('#assignments');
+    var i = $('#assignments tr').size() + 1;
+
     $("#submit").click(function(){
       $.ajax({
         url: "{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}",
@@ -13,15 +16,58 @@
           person_id: $("#person").val()
         },
         dataType: "JSON",
-        success: function (jsonStr) {
-          $("#result").text(JSON.stringify(jsonStr));
+        error: function (request, status, error) {
+          console.log(error);
+        },
+        success: function (response) {
+          var length = $('#person').children('option').length;
+          var person = $.parseJSON(response);
+
+          tblDiv.append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>');
+          i++;
+
+          $("#unassigned-option-"+person.id).remove();
+          length--;
+
+          if(length == 0){
+            $("#add-person-div").hide();
+          }
         }
-      });
+      })
       return false;
     });
   });
 </script>
-<div class="container">
+<script type="text/javascript">
+$(document).ready(function() {
+  var tblDiv = $('#assignments');
+  var i = $('#assignments tr').size() + 1;
+
+  $(".remove-button").click(function(){
+    $.ajax({
+      url: "{{ path('unassign_person', {'project_id':project_id}) }}",
+      type: "POST",
+      data: {
+        project_id: $("#project").val(),
+        person_id: $(this).attr('data-row-id')
+      },
+      //dataType: "JSON",
+      error: function (request, status, error) {
+        console.log(error);
+      },
+      success: function (response) {
+        alert("RESP DEL" + response)
+        var person = $.parseJSON(response);
+        var rowToDelete = $('td[data-row-id=person.id]');
+        $(rowToDelete).parent().remove(rowToDelete);
+        i--;
+      }
+    })
+    return false;
+  });
+});
+</script>
+<div id="assignments_div" class="container">
   <div class="row">
     {% for flash_message in app.session.flashBag.get('notice') %}
       <div class="flash-notice">
@@ -37,14 +83,14 @@
         {% if project_unassigned_list is null or project_unassigned_list is empty %}
         {% else %}
         <form class="form-horizontal" role="form" method="POST" action="#">
-          <div class="row">
+          <div id="add-person-div" class="row">
             <input id="project" type="hidden" name="project_id" value="{{ project_id }}">
             <div class="form-group">
               <div class="col-md-7 col-md-offset-1">
                 <label for="person"></label>
                 <select class="form-control" id="person" name="person_id">
                   {% for unassigned in project_unassigned_list %}
-                    <option value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
+                    <option id="unassigned-option-{{ unassigned.id }}" value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -61,13 +107,15 @@
         {% endif %}
 
         {% if project_assignments is null or project_assignments is empty %}
-          <div class="row">
+          <div id="add-person-div" class="row">
             <div class="col-md-8 col-md-offset-4">
               <h4>No assignments yet</h4>
             </div>
           </div>
+          <table id="assignments" class="table table-hover table-responsive">
+          </table>
         {% else %}
-          <table class="table table-hover table-responsive">
+          <table id="assignments" class="table table-hover table-responsive">
             <thead>
               <tr>
                 <th>Current Members</th>
@@ -76,9 +124,9 @@
             </thead>
             <tbody>
             {% for project_assignment in project_assignments %}
-              <tr>
+              <tr data-row-id="{{ project_assignment.id }}">
                 <td>{{ project_assignment.id }} {{ project_assignment.first_name }} {{ project_assignment.last_name}}</td>
-                <td><a href="{{ path('unassign_person', {'project_id':project_id,'project_name':project_name, 'person_id':project_assignment.id}) }}">{{ 'Remove'|trans }}</a></td>
+                <td><a class="remove-button" data-row-id="{{ project_assignment.id }}" href="#">{{ 'Remove'|trans }}</a></td>
               </tr>
             {% endfor %}
           </tbody>
