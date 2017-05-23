@@ -39,44 +39,41 @@
   });
 </script>
 <script type="text/javascript">
-$(document).ready(function() {
+$(document).on("click",".remove-button",function(e){
   var tblDiv = $('#assignments');
   var i = $('#assignments tr').size() + 1;
 
-  $(".remove-button").click(function(){
-  //$(document).on("click",".remove-button",function(e)){
-    var $tr = $(this).closest('tr');
+  var $tr = $(this).closest('tr');
 
-    $.ajax({
-      url: "{{ path('unassign_person', {'project_id':project_id}) }}",
-      type: "POST",
-      data: {
-        project_id: $("#project").val(),
-        person_id: $(this).attr('data-row-id')
-      },
-      dataType: "JSON",
-      error: function (request, status, error) {
-        console.log(error);
-      },
-      success: function (response) {
-        var length = $('#person').children('option').length;
-        var person = $.parseJSON(response);
+  $.ajax({
+    url: "{{ path('unassign_person', {'project_id':project_id}) }}",
+    type: "POST",
+    data: {
+      project_id: $("#project").val(),
+      person_id: $(this).attr('data-row-id')
+    },
+    dataType: "JSON",
+    error: function (request, status, error) {
+      console.log(error);
+    },
+    success: function (response) {
+      var length = $('#person').children('option').length;
+      var person = $.parseJSON(response);
 
-        $tr.find('td').fadeOut(300,function(){
-          $tr.remove();
-        });
-        i--;
+      $tr.find('td').fadeOut(300,function(){
+        $tr.remove();
+      });
+      i--;
 
-        $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
-        length++;
+      $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
+      length++;
 
-        if(length>0){
-          $("#add-person-div").show();
-        }
+      if(length>0){
+        $("#add-person-div").show();
       }
-    })
-    return false;
-  });
+    }
+  })
+  return false;
 });
 </script>
 <div id="assignments_div" class="container">
@@ -92,10 +89,12 @@ $(document).ready(function() {
       <div class="col-md-6 col-md-offset-1">
         <h3>{{ project_name }}</h3>
 
-        {% if project_unassigned_list is null or project_unassigned_list is empty %}
-        {% else %}
         <form class="form-horizontal" role="form" method="POST" action="#">
-          <div id="add-person-div" class="row">
+          {% if project_unassigned_list is null or project_unassigned_list is empty %}
+            <div id="add-person-div" class="row" style="display:none;">
+          {% else %}
+            <div id="add-person-div" class="row">
+          {% endif %}
             <input id="project" type="hidden" name="project_id" value="{{ project_id }}">
             <div class="form-group">
               <div class="col-md-7 col-md-offset-1">
@@ -116,7 +115,6 @@ $(document).ready(function() {
             </div>
           </div>
         </form>
-        {% endif %}
 
         {% if project_assignments is null or project_assignments is empty %}
           <div id="add-person-div" class="row">
