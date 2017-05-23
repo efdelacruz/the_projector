@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    var tblDiv = $('#assignments');
+    var i = $('#assignments tr').size() + 1;
+
+    $("#submit").click(function(){
+      $.ajax({
+        url: "{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}",
+        type: "POST",
+        data: {
+          project_id: $("#project").val(),
+          person_id: $("#person").val()
+        },
+        dataType: "JSON",
+        error: function (request, status, error) {
+          console.log(error);
+        },
+        success: function (response) {
+          var length = $('#person').children('option').length;
+          var person = $.parseJSON(response);
+
+          tblDiv.append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>')
+          i++;
+
+          $("#unassigned-option-"+person.id).remove();
+          length--;
+
+          if(length == 0){
+            $("#add-person-div").hide();
+          }
+        }
+      })
+      return false;
+    });
+  });
+</script>
+<script type="text/javascript">
+$(document).on("click",".remove-button",function(e){
+  var tblDiv = $('#assignments');
+  var i = $('#assignments tr').size() + 1;
+
+  var $tr = $(this).closest('tr');
+
+  $.ajax({
+    url: "{{ path('unassign_person', {'project_id':project_id}) }}",
+    type: "POST",
+    data: {
+      project_id: $("#project").val(),
+      person_id: $(this).attr('data-row-id')
+    },
+    dataType: "JSON",
+    error: function (request, status, error) {
+      console.log(error);
+    },
+    success: function (response) {
+      var length = $('#person').children('option').length;
+      var person = $.parseJSON(response);
+
+      $tr.find('td').fadeOut(300,function(){
+        $tr.remove();
+      });
+      i--;
+
+      $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
+      length++;
+
+      if(length>0){
+        $("#add-person-div").show();
+      }
+    }
+  })
+  return false;
+});
+</script>
+<div id="assignments_div" class="container">
+  <div class="row">
+    {% for flash_message in app.session.flashBag.get('notice') %}
+      <div class="flash-notice">
+        {{ flash_message }}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="row">
+    <div class="col-md-offset-1">
+      <div class="col-md-6 col-md-offset-1">
+        <h3>{{ project_name }}</h3>
+
+        <form class="form-horizontal" role="form" method="POST" action="#">
+          {% if project_unassigned_list is null or project_unassigned_list is empty %}
+            <div id="add-person-div" class="row" style="display:none;">
+          {% else %}
+            <div id="add-person-div" class="row">
+          {% endif %}
+            <input id="project" type="hidden" name="project_id" value="{{ project_id }}">
+            <div class="form-group">
+              <div class="col-md-7 col-md-offset-1">
+                <label for="person"></label>
+                <select class="form-control" id="person" name="person_id">
+                  {% for unassigned in project_unassigned_list %}
+                    <option id="unassigned-option-{{ unassigned.id }}" value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-3 col-md-offset-1">
+                <button id="submit" type="submit" class="btn btn-primary">
+                  <i class="fa fa-btn fa-user"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        {% if project_assignments is null or project_assignments is empty %}
+          <div id="add-person-div" class="row">
+            <div class="col-md-8 col-md-offset-4">
+              <h4>No assignments yet</h4>
+            </div>
+          </div>
+          <table id="assignments" class="table table-hover table-responsive">
+          </table>
+        {% else %}
+          <table id="assignments" class="table table-hover table-responsive">
+            <thead>
+              <tr>
+                <th>Current Members</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for project_assignment in project_assignments %}
+              <tr data-row-id="{{ project_assignment.id }}">
+                <td>{{ project_assignment.id }} {{ project_assignment.first_name }} {{ project_assignment.last_name}}</td>
+                <td><a class="remove-button" data-row-id="{{ project_assignment.id }}" href="#">{{ 'Remove'|trans }}</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+    <div class="col-md-3 col-md-offset-1">
+    </div>
+  </div>
+</div>
+
+{% endblock %}

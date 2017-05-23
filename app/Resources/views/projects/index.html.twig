@@ -29,7 +29,7 @@
               <tr>
                 <td>{{ project.name }}</td>
                 <td>{{ project.budget }}</td>
-                <td><a href="#">{{ 'Assignments'|trans }}</a></td>
+                <td><a href="{{ path('view_assignments', {'project_id':project.id, 'project_name':project.name}) }}">{{ 'Assignments'|trans }}</a></td>
               </tr>
             {% endfor %}
           </tbody>
