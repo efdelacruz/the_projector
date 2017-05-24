@@ -3,11 +3,10 @@
 {% block body %}
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
+  $(document).on("click","#submit",function(e){
     var tblDiv = $('#assignments');
-    var i = $('#assignments tr').size() + 1;
+    var i = $('#assignments tr').size()-1;
 
-    $("#submit").click(function(){
       $.ajax({
         url: "{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}",
         type: "POST",
@@ -32,16 +31,23 @@
           if(length == 0){
             $("#add-person-div").hide();
           }
+
+          if(i > 0){
+            $("#assignments").show();
+            $("#no-person-div").hide();
+          }else{
+            $("#assignments").hide();
+            $("#no-person-div").show();
+          }
         }
       })
       return false;
-    });
   });
 </script>
 <script type="text/javascript">
 $(document).on("click",".remove-button",function(e){
   var tblDiv = $('#assignments');
-  var i = $('#assignments tr').size() + 1;
+  var i = $('#assignments tr').size()-1;
 
   var $tr = $(this).closest('tr');
 
@@ -67,9 +73,17 @@ $(document).on("click",".remove-button",function(e){
 
       $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
       length++;
-
+      
       if(length>0){
         $("#add-person-div").show();
+      }
+
+      if(i == 0){
+        $("#assignments").hide();
+        $("#no-person-div").show();
+      }else{
+        $("#assignments").show();
+        $("#no-person-div").hide();
       }
     }
   })
@@ -117,14 +131,27 @@ $(document).on("click",".remove-button",function(e){
         </form>
 
         {% if project_assignments is null or project_assignments is empty %}
-          <div id="add-person-div" class="row">
+          <div id="no-person-div" class="row">
             <div class="col-md-8 col-md-offset-4">
               <h4>No assignments yet</h4>
             </div>
           </div>
-          <table id="assignments" class="table table-hover table-responsive">
+          <table id="assignments" class="table table-hover table-responsive" style="display:none;">
+            <thead>
+              <tr>
+                <th>Current Members</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
           </table>
         {% else %}
+          <div id="no-person-div" class="row" style="display:none;">
+            <div class="col-md-8 col-md-offset-4">
+              <h4>No assignments yet</h4>
+            </div>
+          </div>
           <table id="assignments" class="table table-hover table-responsive">
             <thead>
               <tr>
