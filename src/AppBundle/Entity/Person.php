@@ -25,11 +25,19 @@ class Person implements UserInterface, EquatableInterface
 
   /**
    * @ORM\Column(type="string", length=50)
+   * @Assert\Length(
+   *    max = 50,
+   *    maxMessage = "Your last name cannot be longer than {{ limit }} characters"
+   * )
    */
   private $last_name;
 
   /**
    * @ORM\Column(type="string", length=50)
+   * @Assert\Length(
+   *    max = 50,
+   *    maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+   * )
    */
   private $first_name;
 
@@ -37,10 +45,14 @@ class Person implements UserInterface, EquatableInterface
    * @ORM\Column(type="string", length=50, unique=true)
    * @Assert\Length(
    *    min = 5,
-   *    max = 200,
+   *    max = 50,
    *    minMessage = "Your username must be at least {{ limit }} characters long",
    *    maxMessage = "Your username cannot be longer than {{ limit }} characters"
    * )
+   * @Assert\Email(
+        *     message = "The email '{{ value }}' is not a valid email.",
+        *     checkHost = true
+        * )
    */
   private $username;
 

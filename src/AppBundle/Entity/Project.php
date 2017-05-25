@@ -22,11 +22,20 @@ class Project
   /**
    * @ORM\Column(type="string", length=50)
    * @Assert\NotBlank()
+   * @Assert\Length(
+   *    max = 50,
+   *    maxMessage = "Project code cannot be longer than {{ limit }} characters"
+   * )
+   * @Assert\Type(type="alnum", message="Project code should be alphanumeric")
    */
   private $code;
 
   /**
    * @ORM\Column(type="string", length=50)
+   * @Assert\Length(
+   *    max = 50,
+   *    maxMessage = "Project name cannot be longer than {{ limit }} characters"
+   * )
    */
   private $name;
 
