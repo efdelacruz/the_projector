@@ -13,3 +13,4 @@ services:
 
     app.person_provider:
         class: AppBundle\Security\PersonProvider
+        arguments: ['@doctrine']

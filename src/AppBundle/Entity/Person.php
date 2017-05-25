@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="Persons")
  * @UniqueEntity(fields="username", message="This username is already in use")
  */
-class Person implements UserInterface
+class Person implements UserInterface, EquatableInterface
 {
   /**
    * @ORM\Column(type="integer")
@@ -245,5 +246,22 @@ class Person implements UserInterface
     public function getSalt()
     {
         return null;
+    }
+
+    public function isEqualTo(UserInterface $user)
+    {
+      if (!$user instanceof Person) {
+          return false;
+      }
+
+      if ($this->password !== $user->getPassword()) {
+          return false;
+      }
+
+      if ($this->username !== $user->getUsername()) {
+          return false;
+      }
+
+      return true;
     }
 }

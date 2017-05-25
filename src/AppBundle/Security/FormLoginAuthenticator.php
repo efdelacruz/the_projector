@@ -42,7 +42,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         ];
     }
 
-    public function getUser($credentials, PersonProvider $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $username = $credentials['username'];
 
