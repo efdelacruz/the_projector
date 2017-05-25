@@ -19,23 +19,13 @@ class PersonProvider implements UserProviderInterface
   public function loadUserByUsername($username)
   {
     $em = $this->doctrine->getManager();
-    $userData = $em->getRepository('AppBundle:Person')->findOneByUsername($username);
-    // pretend it returns an array on success, false if there is no user
-
-    //$conn = $this->get('database_connection');
-    //$sql = "SELECT username, password, role FROM Persons WHERE usernme = :username";
-    //$stmt = $conn->prepare($sql);
-    //$stmt->bindValue("username", $username);
-    //$stmt->execute();
-    //$userData = $stmt.fetch();
+    $userData = $em->getRepository('AppBundle:Person')->findOneByUsername($username)
 
     if ($userData) {
       $username = $userData->getUsername();
       $password = $userData->getPassword();
       $role = $userData->getRole();
-      //$password = $userData['password'];
 
-      //return new Person($userData['username'], $userData['password'], $userData['role']);
       return new Person($username, $password, $role);
     }
 
