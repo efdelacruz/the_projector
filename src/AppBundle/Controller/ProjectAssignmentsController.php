@@ -21,7 +21,6 @@ class ProjectAssignmentsController extends Controller
    */
   public function viewAssignmentsAction(Request $request, $project_id)
   {
-    $project_name = $request->query->get('project_name');
     $conn = $this->get('database_connection');
 
     $assignments_service = new AssignmentsService();
@@ -31,19 +30,19 @@ class ProjectAssignmentsController extends Controller
       'project_assignments' => $ret["assigned_list"],
       'project_unassigned_list' => $ret["unassigned_list"],
       'project_id' => $project_id,
-      'project_name' => $project_name
+      'project_name' => $ret["project_name"]
     ));
   }
 
   /**
-   * @Route("/projector/projects/{project_id}/assign", name="assign_person")
+   * @Route("/projector/projects/assign", name="assign_person")
    */
-  public function assignPersonToProject(Request $request, $project_id)
+  public function assignPersonToProject(Request $request)
   {
     if ($request->isXmlHttpRequest())
     {
+      $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
-      $project_name = $request->query->get('project_name');
       $conn = $this->get('database_connection');
 
       $assignments_service = new AssignmentsService();
@@ -60,12 +59,13 @@ class ProjectAssignmentsController extends Controller
   }
 
   /**
-   * @Route("/projector/projects/{project_id}/unassign", name="unassign_person")
+   * @Route("/projector/projects/unassign", name="unassign_person")
    */
-  public function unassignPersonFromProject(Request $request, $project_id)
+  public function unassignPersonFromProject(Request $request)
   {
     if ($request->isXmlHttpRequest())
     {
+      $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
 

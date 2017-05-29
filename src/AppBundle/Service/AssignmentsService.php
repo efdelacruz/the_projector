@@ -24,7 +24,13 @@ class AssignmentsService
     $stmt->execute();
     $unassigned_list = $stmt->fetchAll();
 
-    return array("assigned_list" => $assigned_list, "unassigned_list" => $unassigned_list);
+    $sql3 = "SELECT Projects.name from Projects WHERE Projects.id = :project_id";
+    $stmt = $conn->prepare($sql3);
+    $stmt->bindValue("project_id", $project_id);
+    $stmt->execute();
+    $proj_name = $stmt->fetchColumn();
+
+    return array("project_name" => $proj_name, "assigned_list" => $assigned_list, "unassigned_list" => $unassigned_list);
   }
 
   public function addPersonToProject($project_id, $person_id, $conn){
