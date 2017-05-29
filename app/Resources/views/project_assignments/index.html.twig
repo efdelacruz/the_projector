@@ -3,93 +3,91 @@
 {% block body %}
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
-  $(document).on("click","#submit",function(e){
-    var tblDiv = $('#assignments');
-    var i = $('#assignments tr').size()-1;
-
-      $.ajax({
-        url: "{{ path('assign_person', {'project_id':project_id,'project_name':project_name}) }}",
-        type: "POST",
-        data: {
-          project_id: $("#project").val(),
-          person_id: $("#person").val()
-        },
-        dataType: "JSON",
-        error: function (request, status, error) {
-          console.log(error);
-        },
-        success: function (response) {
-          var length = $('#person').children('option').length;
-          var person = $.parseJSON(response);
-
-          tblDiv.append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>')
-          i++;
-
-          $("#unassigned-option-"+person.id).remove();
-          length--;
-
-          if(length == 0){
-            $("#add-person-div").hide();
-          }
-
-          if(i > 0){
-            $("#assignments").show();
-            $("#no-person-div").hide();
-          }else{
-            $("#assignments").hide();
-            $("#no-person-div").show();
-          }
-        }
-      })
-      return false;
-  });
-</script>
-<script type="text/javascript">
-$(document).on("click",".remove-button",function(e){
-  var tblDiv = $('#assignments');
-  var i = $('#assignments tr').size()-1;
-
-  var $tr = $(this).closest('tr');
-
-  $.ajax({
-    url: "{{ path('unassign_person', {'project_id':project_id}) }}",
-    type: "POST",
-    data: {
-      project_id: $("#project").val(),
-      person_id: $(this).attr('data-row-id')
-    },
-    dataType: "JSON",
-    error: function (request, status, error) {
-      console.log(error);
-    },
-    success: function (response) {
-      var length = $('#person').children('option').length;
-      var person = $.parseJSON(response);
-
-      $tr.find('td').fadeOut(300,function(){
-        $tr.remove();
-      });
-      i--;
-
-      $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
-      length++;
-      
-      if(length>0){
-        $("#add-person-div").show();
-      }
-
-      if(i == 0){
-        $("#assignments").hide();
-        $("#no-person-div").show();
-      }else{
-        $("#assignments").show();
-        $("#no-person-div").hide();
-      }
+  var updateView = function (tbl_size){
+    if($('#person').children('option').length == 0){
+      $("#add-person-div").hide();
+    }else{
+      $("#add-person-div").show();
     }
+
+    if(tbl_size > 0){
+      $("#assignments").show();
+      $("#no-person-div").hide();
+    }else{
+      $("#assignments").hide();
+      $("#no-person-div").show();
+    }
+  }
+
+  var assignPerson = function(){
+    $.ajax({
+      url: "{{ path('assign_person') }}",
+      type: "POST",
+      data: {
+        project_id: $("#project").val(),
+        person_id: $("#person").val()
+      },
+      dataType: "JSON",
+      error: function (request, status, error) {
+        console.log(error);
+      },
+
+
+      success: function (response) {
+        var person = $.parseJSON(response);
+        var tbl_size =$('#assignments tr').size()-1;
+
+        $('#assignments').append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>')
+        tbl_size++;
+
+        $("#unassigned-option-"+person.id).remove();
+
+        updateView(tbl_size);
+      }
+    })
+  }
+
+  var unassignPerson = function(a){
+    $.ajax({
+      url: "{{ path('unassign_person') }}",
+      type: "POST",
+      data: {
+        project_id: $("#project").val(),
+        person_id: $(a).attr('data-row-id')
+      },
+      dataType: "JSON",
+      error: function (request, status, error) {
+        console.log(error);
+      },
+      success: function (response) {
+        var person = $.parseJSON(response);
+        var $tr = $(a).closest('tr');
+        var tbl_size =$('#assignments tr').size()-1;
+
+        $tr.find('td').fadeOut(300,function(){
+          $tr.remove();
+        });
+        tbl_size--;
+
+        $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
+
+        updateView(tbl_size);
+      }
+    })
+  }
+
+  $(document).on("click", "#submit", function(e){
+    assignPerson();
+    return false;
+  });
+
+  $(document).on("click", ".remove-button", function(e){
+    unassignPerson($(this));
+    return false;
   })
-  return false;
-});
+
 </script>
+
 <div id="assignments_div" class="container">
   <div class="row">
     {% for flash_message in app.session.flashBag.get('notice') %}
