@@ -36,9 +36,14 @@
 
       success: function (response) {
         var person = $.parseJSON(response);
-        var tbl_size =$('#assignments tr').size()-1;
+        var tbl_size = $('#assignments tr').size()-1;
+        var newRow = '<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>';
 
-        $('#assignments').append('<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>')
+        $(newRow).click(function(){
+          unassignPerson($(this));
+        });
+
+        $('#assignments').append(newRow)
         tbl_size++;
 
         $("#unassigned-option-"+person.id).remove();
@@ -77,16 +82,15 @@
     })
   }
 
-  $(document).on("click", "#submit", function(e){
-    assignPerson();
-    return false;
+  $(document).ready(function(){
+    $("#submit").click(function(){
+      assignPerson();
+    });
+    $(".remove-button").click(function(){
+      unassignPerson($(this));
+    });
   });
-
-  $(document).on("click", ".remove-button", function(e){
-    unassignPerson($(this));
-    return false;
-  });
-})(JQuery);
+})(jQuery);
 </script>
 
 <div id="assignments_div" class="container">
