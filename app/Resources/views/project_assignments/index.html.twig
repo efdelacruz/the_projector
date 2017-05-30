@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
 (function($){
   var updateView = function (tbl_size){
@@ -32,12 +31,10 @@
       error: function (request, status, error) {
         console.log(error);
       },
-
-
       success: function (response) {
         var person = $.parseJSON(response);
         var tbl_size = $('#assignments tr').size()-1;
-        var newRow = '<tr data-row-id='+person.id+'><td>'+person.id+' '+person.first_name+' '+person.last_name+'</td><td><a class="remove-button" data-row-id="'+person.id+'" href="#">{{ 'Remove'|trans }}</a></td></tr>';
+        var newRow = '<tr data-row-id='+$("#person").val()+'><td>'+$("#person option:selected").text()+'</td><td><a class="remove-button" data-row-id="'+$("#person").val()+'" href="#">{{ 'Remove'|trans }}</a></td></tr>';
 
         $(newRow).click(function(){
           unassignPerson($(this));
@@ -46,7 +43,7 @@
         $('#assignments').append(newRow)
         tbl_size++;
 
-        $("#unassigned-option-"+person.id).remove();
+        $("#unassigned-option-"+$("#person").val()).remove();
 
         updateView(tbl_size);
       }
@@ -75,7 +72,7 @@
         });
         tbl_size--;
 
-        $("#person").append('<option id="unassigned-option-'+person.id+'" value="'+person.id+'">'+person.first_name+' '+person.last_name+'<\/option>');
+        $("#person").append('<option id="unassigned-option-'+$(a).attr('data-row-id')+'" value="'+$(a).attr('data-row-id')+'">'+$(a).closest('tr').children('td.assignment-info').text()+'<\/option>');
 
         updateView(tbl_size);
       }
@@ -165,7 +162,7 @@
             <tbody>
             {% for project_assignment in project_assignments %}
               <tr data-row-id="{{ project_assignment.id }}">
-                <td>{{ project_assignment.id }} {{ project_assignment.first_name }} {{ project_assignment.last_name}}</td>
+                <td class="assignment-info">{{ project_assignment.first_name }} {{ project_assignment.last_name}}</td>
                 <td><a class="remove-button" data-row-id="{{ project_assignment.id }}" href="#">{{ 'Remove'|trans }}</a></td>
               </tr>
             {% endfor %}
