@@ -32,7 +32,6 @@
         console.log(error);
       },
       success: function (response) {
-        var person = $.parseJSON(response);
         var tbl_size = $('#assignments tr').size()-1;
         var newRow = '<tr data-row-id='+$("#person").val()+'><td>'+$("#person option:selected").text()+'</td><td><a class="remove-button" data-row-id="'+$("#person").val()+'" href="#">{{ 'Remove'|trans }}</a></td></tr>';
 
@@ -63,7 +62,6 @@
         console.log(error);
       },
       success: function (response) {
-        var person = $.parseJSON(response);
         var $tr = $(a).closest('tr');
         var tbl_size =$('#assignments tr').size()-1;
 

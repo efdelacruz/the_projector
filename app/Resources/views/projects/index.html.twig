@@ -1,7 +1,54 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+<script type="text/javascript">
+(function($){
+  var getProjects = function(page){
+    $.ajax({
+      url: "{{ path('projects') }}",
+      type: "GET",
+      data: {
+        page: page
+      },
+      dataType: "JSON",
+      error: function (request, status, error) {
+        console.log(error);
+      },
+      success: function(response) {
+        // replace table contents
+        alert(response);
+        var resp = $.parseJSON(response);
+        alert(resp.projects);
+        var content = '';
 
+        $.each(resp.projects, function(i, proj){
+          alert(proj.name);
+        });
+
+        //for (var i = 0; i < json.length; i++) {
+        //  content += '<tr id="' + json[i].ID + '">';
+        //  content += '<td><input id="check_' + json[i].ID + '" name="check_' + json[i].ID + '" type="checkbox" value="' + json[i].ID + '" autocomplete=OFF /></td>';
+        //  content += '<td>' + json[i].ID + '</td>';
+        //  content += '<td>' + json[i].Name + '</td>';
+        //  content += '<td><a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>';
+        //  content += '</tr>';
+        //}
+
+        //$('#myTable tbody').html(content);
+      }
+    })
+  }
+
+  $(document).ready(function(){
+    $("#prev").click(function(){
+      getProjects( {{ page }} - 1 );
+    });
+    $("#next").click(function(){
+      getProjects( {{ page }} + 1 );
+    });
+  });
+})(jQuery);
+</script>
 <div class="container">
   <div class="row">
     <div class="col-md-4 col-md-offset-4">
@@ -17,7 +64,7 @@
         {% if projects is null or projects is empty %}
           <h4>No projects available</h4>
         {% else %}
-          <table class="table table-hover table-responsive">
+          <table id="project-list" data-page-id="{{ page }}" class="table table-hover table-responsive">
             <thead>
               <tr>
                 <th>Project Name</th>
@@ -38,12 +85,12 @@
 
         {% if page > 1 and page <= max_page %}
           <li>
-            <a href="{{ path('projects', {page: page-1 }) }}"><< Previous Page</a>
+            <a id="prev" href="#"><< Previous Page</a>
           </li>
         {% endif %}
         {% if page >= 1 and page < max_page %}
           <li>
-            <a href="{{ path('projects', {page: page+1 }) }}">Next Page >> </a>
+            <a id="next" href="#">Next Page >> </a>
           </li>
         {% endif %}
 
