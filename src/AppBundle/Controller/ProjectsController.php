@@ -8,20 +8,29 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\DBAL\Connection;
+use AppBundle\Service\ProjectsService;
 
 class ProjectsController extends Controller
 {
   /**
    *  @Route("/projector/projects", name="projects")
    */
-  public function viewProjectsAction()
+  public function viewProjectsAction(Request $request, $page = 1)
   {
-    $em = $this->getDoctrine()->getManager();
-    $projects = $em->getRepository('AppBundle:Project')->findAll();
+    if ($request->query->get('page') != null){
+      $page = $request->query->get('page');
+    }
+    $conn = $this->get('database_connection');
+    $proj_service = new ProjectsService();
+    $projects = $proj_service->getProjects($conn, $page);
+
+    $max_page = $proj_service->getMaxPages($conn);
 
     return $this->render('projects/index.html.twig', array(
-      'projects' => $projects
+      'projects' => $projects,
+      'page' => $page,
+      'max_page' => $max_page
     ));
   }
 
@@ -31,10 +40,6 @@ class ProjectsController extends Controller
   public function newProjectAction(Request $request)
   {
     $project = new Project();
-    $project->setCode('PROJ_CODE');
-    $project->setName('Project Name');
-    $project->setBudget(100000);
-    $project->setRemarks('Any remarks?');
 
     $form = $this->createForm(ProjectType::class, $project);
 

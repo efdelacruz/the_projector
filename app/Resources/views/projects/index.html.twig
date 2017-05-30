@@ -35,6 +35,18 @@
             {% endfor %}
           </tbody>
         </table>
+
+        {% if page > 1 and page <= max_page %}
+          <li>
+            <a href="{{ path('projects', {page: page-1 }) }}"><< Previous Page</a>
+          </li>
+        {% endif %}
+        {% if page >= 1 and page < max_page %}
+          <li>
+            <a href="{{ path('projects', {page: page+1 }) }}">Next Page >> </a>
+          </li>
+        {% endif %}
+
       {% endif %}
     </div>
     <div class="col-md-3 col-md-offset-1">

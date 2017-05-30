@@ -3,6 +3,7 @@
 {% block body %}
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
+(function($){
   var updateView = function (tbl_size){
     if($('#person').children('option').length == 0){
       $("#add-person-div").hide();
@@ -84,8 +85,8 @@
   $(document).on("click", ".remove-button", function(e){
     unassignPerson($(this));
     return false;
-  })
-
+  });
+})(JQuery);
 </script>
 
 <div id="assignments_div" class="container">
