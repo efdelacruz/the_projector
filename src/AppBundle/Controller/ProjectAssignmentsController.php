@@ -46,14 +46,11 @@ class ProjectAssignmentsController extends Controller
       $conn = $this->get('database_connection');
 
       $assignments_service = new AssignmentsService();
-
       $assignments_service->addPersonToProject($project_id, $person_id, $conn);
-      $assignee = $assignments_service->getLastMovedPerson($person_id, $conn);
 
       return new JsonResponse(json_encode(array(
-        'id'=>$person_id,
-        'first_name'=>$assignee['first_name'],
-        'last_name'=>$assignee['last_name']
+        'success'=>true,
+        'status'=>200
       )));
     }
   }
@@ -70,14 +67,11 @@ class ProjectAssignmentsController extends Controller
       $conn = $this->get('database_connection');
 
       $assignments_service = new AssignmentsService();
-
       $assignments_service->removePersonFromProject($project_id, $person_id, $conn);
-      $assignee = $assignments_service->getLastMovedPerson($person_id, $conn);
 
       return new JsonResponse(json_encode(array(
-        'id'=>$person_id,
-        'first_name'=>$assignee['first_name'],
-        'last_name'=>$assignee['last_name']
+        'success'=>true,
+        'status'=>200
       )));
     }
   }
