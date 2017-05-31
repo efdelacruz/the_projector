@@ -80,6 +80,7 @@
   $(document).ready(function(){
     $("#submit").click(function(){
       assignPerson();
+      return false;
     });
     $(".remove-button").click(function(){
       unassignPerson($(this));
