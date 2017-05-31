@@ -89,7 +89,7 @@
 })(jQuery);
 </script>
 
-<div id="assignments_div" class="container">
+<div ng-app="projAssignments" ng-controller="projAssignmentsCtrl" id="assignments_div" class="container">
   <div class="row">
     {% for flash_message in app.session.flashBag.get('notice') %}
       <div class="flash-notice">
@@ -112,7 +112,7 @@
             <div class="form-group">
               <div class="col-md-7 col-md-offset-1">
                 <label for="person"></label>
-                <select class="form-control" id="person" name="person_id">
+                <select class="form-control" id="person" name="person_id" ng-model="person">
                   {% for unassigned in project_unassigned_list %}
                     <option id="unassigned-option-{{ unassigned.id }}" value="{{ unassigned.id }}">{{ unassigned.first_name }} {{ unassigned.last_name }}</option>
                   {% endfor %}
