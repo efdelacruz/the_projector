@@ -25,8 +25,8 @@ class ProjectsController extends Controller
       $page = $request->query->get('page');
 
       $conn = $this->get('database_connection');
-      $proj_service = new ProjectsService();
-      $projects = $proj_service->getProjects($conn, $page);
+      $proj_service = new ProjectsService($conn);
+      $projects = $proj_service->getProjects($page);
 
       return new JsonResponse(json_encode(array(
         'projects' => $projects,
@@ -40,9 +40,9 @@ class ProjectsController extends Controller
       }
 
       $conn = $this->get('database_connection');
-      $proj_service = new ProjectsService();
-      $projects = $proj_service->getProjects($conn, $page);
-      $max_page = $proj_service->getMaxPages($conn);
+      $proj_service = new ProjectsService($conn);
+      $projects = $proj_service->getProjects($page);
+      $max_page = $proj_service->getMaxPages();
 
       return $this->render('projects/index.html.twig', array(
         'projects' => $projects,

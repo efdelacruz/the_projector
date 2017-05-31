@@ -1,16 +1,24 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/service_container.html
 parameters:
-    #parameter_name: value
+    # my_service_connection: default
 
 services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
     app.form_login_authenticator:
-        class: AppBundle\Security\FormLoginAuthenticator
-        arguments: ["@router", "@security.password_encoder"]
+      class: AppBundle\Security\FormLoginAuthenticator
+      arguments: ["@router", "@security.password_encoder"]
 
     app.person_provider:
-        class: AppBundle\Security\PersonProvider
-        arguments: ['@doctrine']
+      class: AppBundle\Security\PersonProvider
+      arguments: ['@doctrine']
+
+    app.projects_service:
+      class: AppBundle\Service\ProjectsService
+      arguments: ['@doctrine.dbal.default_connection']
+
+    app.assignments_service:
+      class: AppBundle\Service\AssignmentsService
+      arguments: ['@doctrine.dbal.default_connection']

@@ -23,8 +23,8 @@ class ProjectAssignmentsController extends Controller
   {
     $conn = $this->get('database_connection');
 
-    $assignments_service = new AssignmentsService();
-    $ret = $assignments_service->getAssignedPersonsOnProject($project_id, $conn);
+    $assignments_service = new AssignmentsService($conn);
+    $ret = $assignments_service->getAssignedPersonsOnProject($project_id);
 
     return $this->render('project_assignments/index.html.twig', array(
       'project_assignments' => $ret["assigned_list"],
@@ -45,8 +45,8 @@ class ProjectAssignmentsController extends Controller
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
 
-      $assignments_service = new AssignmentsService();
-      $assignments_service->addPersonToProject($project_id, $person_id, $conn);
+      $assignments_service = new AssignmentsService($conn);
+      $assignments_service->addPersonToProject($project_id, $person_id);
 
       return new JsonResponse(json_encode(array(
         'success'=>true,
@@ -66,8 +66,8 @@ class ProjectAssignmentsController extends Controller
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
 
-      $assignments_service = new AssignmentsService();
-      $assignments_service->removePersonFromProject($project_id, $person_id, $conn);
+      $assignments_service = new AssignmentsService($conn);
+      $assignments_service->removePersonFromProject($project_id, $person_id);
 
       return new JsonResponse(json_encode(array(
         'success'=>true,
