@@ -3,6 +3,18 @@
 {% block body %}
 <script type="text/javascript">
 (function($){
+  var setCurrencyFormat = function(){
+    var proj_tbl_size = $("#project-list tr").size();
+
+    $("#project-list tr").not(":first").each(function(){
+      var td_budget = $(this).find('td.budget');
+      var budget = Number($(td_budget).data('budget'));
+      var budget_localized = budget.toLocaleString("de-DE", {style: "currency", currency: "EUR", minimumFractionDigits: 2});
+
+      $(td_budget).html(budget_localized);
+    });
+  }
+
   var getProjects = function(page){
     $.ajax({
       url: "{{ path('projects') }}",
@@ -23,7 +35,7 @@
         $.each(resp.projects, function(i, proj){
           var url = "/projector/projects/" + proj.id + "/assignments"
           tbody_content += '<tr><td>' + proj.name + '</td>';
-          tbody_content += '<td>' + proj.budget + '</td>';
+          tbody_content += '<td class="budget" data-budget="'+proj.budget+'">' + proj.budget + '</td>';
           tbody_content += '<td><a href="'+ url +'">'+'{{ "Assignments"|trans }}'+'</a></td></tr>';
         });
 
@@ -59,6 +71,7 @@
           $("#next").closest('li').attr('class', 'page-item disabled');
         }
 
+        setCurrencyFormat();
         $("#prev").click(function(){
           getProjects( page - 1 );
         });
@@ -71,6 +84,7 @@
   }
 
   $(document).ready(function(){
+    setCurrencyFormat();
     $("#prev").click(function(){
       getProjects( $("#project-list").data("page") - 1 );
     });
@@ -107,7 +121,7 @@
             {% for project in projects %}
               <tr>
                 <td>{{ project.name }}</td>
-                <td>{{ project.budget }}</td>
+                <td class="budget" data-budget="{{project.budget}}">{{ project.budget }}</td>
                 <td><a href="{{ path('view_assignments', {'project_id':project.id}) }}">{{ 'Assignments'|trans }}</a></td>
               </tr>
             {% endfor %}
