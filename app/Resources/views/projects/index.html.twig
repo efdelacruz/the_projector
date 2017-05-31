@@ -9,7 +9,7 @@
     $("#project-list tr").not(":first").each(function(){
       var td_budget = $(this).find('td.budget');
       var budget = Number($(td_budget).data('budget'));
-      var budget_localized = budget.toLocaleString("de-DE", {style: "currency", currency: "EUR", minimumFractionDigits: 2});
+      var budget_localized = budget.toLocaleString(navigator.language, {style: "currency", currency: "EUR", minimumFractionDigits: 2});
 
       $(td_budget).html(budget_localized);
     });
