@@ -144,6 +144,16 @@ class Person implements UserInterface, EquatableInterface
     }
 
     /**
+     * Get full name
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return ($this->first_name + ' ' + $this->last_name);
+    }
+
+    /**
      * Set username
      *
      * @param string $username

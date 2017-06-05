@@ -26,12 +26,22 @@ class ProjectAssignmentsController extends Controller
     $assignments_service = new AssignmentsService($conn);
     $ret = $assignments_service->getAssignedPersonsOnProject($project_id);
 
-    return $this->render('project_assignments/index.html.twig', array(
-      'project_assignments' => $ret["assigned_list"],
-      'project_unassigned_list' => $ret["unassigned_list"],
-      'project_id' => $project_id,
-      'project_name' => $ret["project_name"]
-    ));
+    if ($request->isXmlHttpRequest())
+    {
+      return new JsonResponse(json_encode([
+        'project_assignments' => $ret["assigned_list"],
+        'project_unassigned_list' => $ret["unassigned_list"],
+        'project_id' => $project_id,
+        'project_name' => $ret["project_name"]
+      ]));
+    }else{
+      return $this->render('project_assignments/index_angular.html.twig', array(
+        'project_assignments' => $ret["assigned_list"],
+        'project_unassigned_list' => $ret["unassigned_list"],
+        'project_id' => $project_id,
+        'project_name' => $ret["project_name"]
+      ));
+    }
   }
 
   /**
@@ -39,8 +49,8 @@ class ProjectAssignmentsController extends Controller
    */
   public function assignPersonToProject(Request $request)
   {
-    if ($request->isXmlHttpRequest())
-    {
+    //if ($request->isXmlHttpRequest())
+    //{
       $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
@@ -52,7 +62,7 @@ class ProjectAssignmentsController extends Controller
         'success'=>true,
         'status'=>200
       )));
-    }
+    //}
   }
 
   /**
@@ -60,8 +70,8 @@ class ProjectAssignmentsController extends Controller
    */
   public function unassignPersonFromProject(Request $request)
   {
-    if ($request->isXmlHttpRequest())
-    {
+    //if ($request->isXmlHttpRequest())
+    //{
       $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
@@ -73,6 +83,6 @@ class ProjectAssignmentsController extends Controller
         'success'=>true,
         'status'=>200
       )));
-    }
+    //}
   }
 }

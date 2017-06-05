@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<script>
+var app = angular.module('projAssignments', ['ngRoute']).config(function($interpolateProvider){
+    $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+});
+
+app.controller('projAssignmentsCtrl', ['scope', 'window', 'http', function($scope, $window, $http) {
+
+    $scope.assignedPax = {{ project_assignments|json_encode|raw }};
+    $scope.unassignedPax = {{ project_unassigned_list|json_encode|raw }};
+    $scope.projectId = {{ project_id }};
+
+    $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+    $scope.optionsFilter = function (option) {
+      var ret = true;
+      angular.forEach($scope.assignedPax, function(ap, i){
+        if (ap.id == option.id){
+          ret = false;
+        }
+      });
+      return ret;
+    }
+
+    $scope.assignPerson = function (e) {
+      e.preventDefault();
+
+      var url = "{{ path('assign_person') }}";
+      var personObj = $.param({
+        'project_id' : $scope.projectId,
+        'person_id' : $scope.personToAdd.id
+      });
+
+      if (typeof ($scope.personToAdd) == "undefined" || $scope.personToAdd == "") {
+        $window.alert("Please select a person a to add!");
+        return false;
+      }
+
+      $http({
+        url : url,
+        method : "POST",
+        data : personObj,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }).then(function (response) {
+          $scope.assignedPax.push({'id':$scope.personToAdd.id, 'first_name':$scope.personToAdd.first_name, 'last_name':$scope.personToAdd.last_name});
+          //angular.forEach($scope.unassignedPax, function(up, i){
+          //  if (ap.id == option.id){
+          //    ret = false;
+          //  }
+          //});
+      }, function(response) {
+          console.log(response);
+      });
+
+      return false;
+    }
+
+    $scope.unassignPerson = function (e, personId) {
+      e.preventDefault();
+
+      var url = "{{ path('unassign_person') }}";
+      var personObj = $.param({
+        'project_id' : $scope.projectId,
+        'person_id' : personId
+      });
+
+      $http({
+        url : url,
+        method : "POST",
+        data : personObj,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }).then(function (response) {
+        var index = -1;
+        var comArr = eval( $scope.assignedPax );
+        for( var i = 0; i < comArr.length; i++ ) {
+          if( comArr[i].id === personId ) {
+            index = i;
+            break;
+          }
+        }
+        if( index === -1 ) {
+          $window.alert( "Something gone wrong" );
+        }
+        $scope.unassignedPax.push($scope.assignedPax[index]);
+        $scope.assignedPax.splice( index, 1 );
+      }, function(response) {
+        console.log(response);
+      });
+
+      $window.alert("Unassign person");
+      return false;
+    }
+}]);
+</script>
+
+<div ng-app="projAssignments" ng-controller="projAssignmentsCtrl" ng-init="" id="assignments_div" class="container">
+  <div class="row">
+    <div class="col-md-offset-1">
+      <div class="col-md-6 col-md-offset-1">
+        <h3>{{ project_name }}</h3>
+
+        <form class="form-horizontal" role="form" method="POST" action="#"  ng-submit="assignPerson($event)">
+          {% if project_unassigned_list is null or project_unassigned_list is empty %}
+            <div id="add-person-div" class="row" style="display:none;">
+          {% else %}
+            <div id="add-person-div" class="row">
+          {% endif %}
+
+            <input id="project" ng-model="projectId" type="hidden" name="project_id" value="{{ project_id }}">
+
+            <div class="form-group">
+              <div class="col-md-7 col-md-offset-1">
+                <label for="person"></label>
+                <select class="form-control" id="person" name="person_id" ng-model="personToAdd" ng-options="up as up.first_name + ' ' + up.last_name for up in unassignedPax | filter: optionsFilter">
+                  <option value="">--- Select a Person ---</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-3 col-md-offset-1">
+                <button id="submit" type="submit" class="btn btn-primary">
+                  <i class="fa fa-btn fa-user"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        {% if project_assignments is null or project_assignments is empty %}
+          <div id="no-person-div" class="row">
+            <div class="col-md-8 col-md-offset-4">
+              <h4>No assignments yet</h4>
+            </div>
+          </div>
+          <table id="assignments" class="table table-hover table-responsive" style="display:none;">
+            <thead>
+              <tr>
+                <th>Current Members</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        {% else %}
+          <div id="no-person-div" class="row" style="display:none;">
+            <div class="col-md-8 col-md-offset-4">
+              <h4>No assignments yet</h4>
+            </div>
+          </div>
+          <table id="assignments" class="table table-hover table-responsive">
+            <thead>
+              <tr>
+                <th>Current Members</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="assigned in assignedPax">
+                <td class="assignment-info">{[{ assigned.first_name }]} {[{ assigned.last_name }]}</td>
+                <td><a class="remove-button" data-row-id="{[{ assigned.id }]}" href="#" ng-click="unassignPerson($event, assigned.id)">Remove</a></td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+      <div class="col-md-3 col-md-offset-1">
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
