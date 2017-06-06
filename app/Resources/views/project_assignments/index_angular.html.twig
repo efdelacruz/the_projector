@@ -2,121 +2,17 @@
 
 {% block body %}
 
-<script>
-var app = angular.module('projAssignments', ['ngRoute'])
-  .config([ '$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider){
-    $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
-    $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-    $httpProvider.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-  }
-]);
-
-app.controller('projAssignmentsCtrl', ['$scope', '$window', '$http', function($scope, $window, $http) {
-
-    $scope.assignedPax = {{ project_assignments|json_encode|raw }};
-    $scope.unassignedPax = {{ project_unassigned_list|json_encode|raw }};
-    $scope.projectId = {{ project_id }};
-
-    $scope.getAssignments = function(e) {
-      e.preventDefault();
-
-      $http({
-        url : url,
-        method : "GET",
-        data : personObj
-      }).then(function (response) {
-        // success
-      }, function(response) {
-        console.log(response);
-      });
-
-      return false;
-    }
-
-    $scope.assignPerson = function (e) {
-      e.preventDefault();
-
-      if (typeof ($scope.personToAdd) == "undefined" || $scope.personToAdd == "") {
-        $window.alert("Please select a person a to add!");
-        return false;
-      }
-
-      var url = "{{ path('assign_person') }}";
-      var personObj = $.param({
-        'project_id' : $scope.projectId,
-        'person_id' : $scope.personToAdd.id
-      });
-
-      $http({
-        url : url,
-        method : "POST",
-        data : personObj
-      }).then(function (response) {
-          var index = -1;
-          var upArr = eval( $scope.unassignedPax );
-          for( var i = 0; i < upArr.length; i++ ) {
-            if( upArr[i].id === $scope.personToAdd.id ) {
-              index = i;
-              break;
-            }
-          }
-          if( index === -1 ) {
-            $window.alert( "Something gone wrong" );
-          }
-          $scope.assignedPax.push($scope.unassignedPax[index]);
-          $scope.unassignedPax.splice( index, 1 );
-      }, function(response) {
-          console.log(response);
-      });
-
-      return false;
-    }
-
-    $scope.unassignPerson = function (e, personId) {
-      e.preventDefault();
-
-      var url = "{{ path('unassign_person') }}";
-      var personObj = $.param({
-        'project_id' : $scope.projectId,
-        'person_id' : personId
-      });
-
-      $http({
-        url : url,
-        method : "POST",
-        data : personObj
-      }).then(function (response) {
-        var index = -1;
-        var apArr = eval( $scope.assignedPax );
-        for( var i = 0; i < apArr.length; i++ ) {
-          if( apArr[i].id === personId ) {
-            index = i;
-            break;
-          }
-        }
-        if( index === -1 ) {
-          $window.alert( "Something gone wrong" );
-        }
-        $scope.unassignedPax.push($scope.assignedPax[index]);
-        $scope.assignedPax.splice( index, 1 );
-      }, function(response) {
-        console.log(response);
-      });
-
-      return false;
-    }
-}]);
+<script src="{{ asset('js/project-assignments.js') }}">
 </script>
 
 <div ng-app="projAssignments" ng-controller="projAssignmentsCtrl" id="assignments_div" class="container">
   <div class="row">
     <div class="col-md-offset-1">
       <div class="col-md-6 col-md-offset-1">
-        <h3>{{ project_name }}</h3>
+        <h3>{[{ projectName }]}</h3>
 
         <form class="form-horizontal" role="form" method="POST" action="#"  ng-submit="assignPerson($event)">
           <div ng-show="unassignedPax.length > 0" id="add-person-div" class="row">
-            <input id="project" ng-model="projectId" type="hidden" name="project_id" value="{{ project_id }}">
 
             <div class="form-group">
               <div class="col-md-7 col-md-offset-1">

@@ -21,26 +21,22 @@ class ProjectAssignmentsController extends Controller
    */
   public function viewAssignmentsAction(Request $request, $project_id)
   {
-    $conn = $this->get('database_connection');
-
-    $assignments_service = new AssignmentsService($conn);
-    $ret = $assignments_service->getAssignedPersonsOnProject($project_id);
-
     if ($request->isXmlHttpRequest())
     {
-      return new JsonResponse(json_encode([
+      $conn = $this->get('database_connection');
+
+      $assignments_service = new AssignmentsService($conn);
+      $ret = $assignments_service->getAssignedPersonsOnProject($project_id);
+
+      return new JsonResponse(json_encode(array(
         'project_assignments' => $ret["assigned_list"],
         'project_unassigned_list' => $ret["unassigned_list"],
         'project_id' => $project_id,
         'project_name' => $ret["project_name"]
-      ]));
+      )));
+
     }else{
-      return $this->render('project_assignments/index_angular.html.twig', array(
-        'project_assignments' => $ret["assigned_list"],
-        'project_unassigned_list' => $ret["unassigned_list"],
-        'project_id' => $project_id,
-        'project_name' => $ret["project_name"]
-      ));
+      return $this->render('project_assignments/index_angular.html.twig');
     }
   }
 

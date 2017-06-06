@@ -1,84 +1,103 @@
-(function($){
-  var updateView = function (tbl_size){
-    if($('#person').children('option').length == 0){
-      $("#add-person-div").hide();
-    }else{
-      $("#add-person-div").show();
+var app = angular.module('projAssignments', ['ngRoute']);
+
+app.config([ '$interpolateProvider', '$httpProvider', '$routeProvider', '$locationProvider', function($interpolateProvider, $httpProvider, $routeProvider, $locationProvider){
+    $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+    $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+    $httpProvider.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+    $locationProvider.html5Mode(true);
+  }
+]);
+
+app.controller('projAssignmentsCtrl', ['$scope', '$window', '$http', '$location', function($scope, $window, $http, $location) {
+
+    $scope.init = function() {
+      $http({
+        url : $location.path(),
+        method : "GET"
+      }).then(function (response) {
+        $scope.data = JSON.parse(response.data);
+        $scope.assignedPax = $scope.data.project_assignments;
+        $scope.unassignedPax = $scope.data.project_unassigned_list;
+        $scope.projectName = $scope.data.project_name;
+        $scope.projectId = $scope.data.project_id;
+      }, function(response) {
+        console.log(response);
+      });
+
+      return false;
+    };
+    $scope.init();
+
+    $scope.assignPerson = function (e) {
+      e.preventDefault();
+
+      if (typeof ($scope.personToAdd) == "undefined" || $scope.personToAdd == "") {
+        $window.alert("Please select a person a to add!");
+        return false;
+      }
+
+      var url = "/projector/projects/assign";
+      var personObj = $.param({
+        'project_id' : $scope.projectId,
+        'person_id' : $scope.personToAdd.id
+      });
+
+      $http({
+        url : url,
+        method : "POST",
+        data : personObj
+      }).then(function (response) {
+          var index = -1;
+          var upArr = eval( $scope.unassignedPax );
+          for( var i = 0; i < upArr.length; i++ ) {
+            if( upArr[i].id === $scope.personToAdd.id ) {
+              index = i;
+              break;
+            }
+          }
+          if( index === -1 ) {
+            $window.alert( "Something gone wrong" );
+          }
+          $scope.assignedPax.push($scope.unassignedPax[index]);
+          $scope.unassignedPax.splice( index, 1 );
+      }, function(response) {
+          console.log(response);
+      });
+
+      return false;
     }
 
-    if(tbl_size > 0){
-      $("#assignments").show();
-      $("#no-person-div").hide();
-    }else{
-      $("#assignments").hide();
-      $("#no-person-div").show();
+    $scope.unassignPerson = function (e, personId) {
+      e.preventDefault();
+
+      var url = "/projector/projects/assign";
+      var personObj = $.param({
+        'project_id' : $scope.projectId,
+        'person_id' : personId
+      });
+
+      $http({
+        url : url,
+        method : "POST",
+        data : personObj
+      }).then(function (response) {
+        var index = -1;
+        var apArr = eval( $scope.assignedPax );
+        for( var i = 0; i < apArr.length; i++ ) {
+          if( apArr[i].id === personId ) {
+            index = i;
+            break;
+          }
+        }
+        if( index === -1 ) {
+          $window.alert( "Something gone wrong" );
+        }
+        $scope.unassignedPax.push($scope.assignedPax[index]);
+        $scope.assignedPax.splice( index, 1 );
+      }, function(response) {
+        console.log(response);
+      });
+
+      return false;
     }
-  }
-
-  var assignPerson = function(){
-    $.ajax({
-      url: "{{ path('assign_person') }}",
-      type: "POST",
-      data: {
-        project_id: $("#project").val(),
-        person_id: $("#person").val()
-      },
-      dataType: "JSON",
-      error: function (request, status, error) {
-        console.log(error);
-      },
-      success: function (response) {
-        var tbl_size = $('#assignments tr').size()-1;
-        var newRow = '<tr data-row-id='+$("#person").val()+'><td>'+$("#person option:selected").text()+'</td><td><a class="remove-button" data-row-id="'+$("#person").val()+'" href="#">{{ 'Remove'|trans }}</a></td></tr>';
-
-        $(newRow).click(function(){
-          unassignPerson($(this));
-        });
-
-        $('#assignments').append(newRow)
-        tbl_size++;
-
-        $("#unassigned-option-"+$("#person").val()).remove();
-
-        updateView(tbl_size);
-      }
-    })
-  }
-
-  var unassignPerson = function(a){
-    $.ajax({
-      url: "{{ path('unassign_person') }}",
-      type: "POST",
-      data: {
-        project_id: $("#project").val(),
-        person_id: $(a).attr('data-row-id')
-      },
-      dataType: "JSON",
-      error: function (request, status, error) {
-        console.log(error);
-      },
-      success: function (response) {
-        var $tr = $(a).closest('tr');
-        var tbl_size =$('#assignments tr').size()-1;
-
-        $tr.find('td').fadeOut(300,function(){
-          $tr.remove();
-        });
-        tbl_size--;
-
-        $("#person").append('<option id="unassigned-option-'+$(a).attr('data-row-id')+'" value="'+$(a).attr('data-row-id')+'">'+$(a).closest('tr').children('td.assignment-info').text()+'<\/option>');
-
-        updateView(tbl_size);
-      }
-    })
-  }
-
-  $(document).ready(function(){
-    $("#submit").click(function(){
-      assignPerson();
-    });
-    $(".remove-button").click(function(){
-      unassignPerson($(this));
-    });
-  });
-})(jQuery);
+}]);
