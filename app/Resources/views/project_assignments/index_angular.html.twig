@@ -3,11 +3,14 @@
 {% block body %}
 
 <script>
-var app = angular.module('projAssignments', ['ngRoute']).config(function($interpolateProvider){
+var app = angular.module('projAssignments', ['ngRoute'])
+  .config([ '$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider){
     $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
-});
+    $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+  }
+]);
 
-app.controller('projAssignmentsCtrl', ['scope', 'window', 'http', function($scope, $window, $http) {
+app.controller('projAssignmentsCtrl', ['$scope', '$window', '$http', function($scope, $window, $http) {
 
     $scope.assignedPax = {{ project_assignments|json_encode|raw }};
     $scope.unassignedPax = {{ project_unassigned_list|json_encode|raw }};
@@ -90,7 +93,6 @@ app.controller('projAssignmentsCtrl', ['scope', 'window', 'http', function($scop
         console.log(response);
       });
 
-      $window.alert("Unassign person");
       return false;
     }
 }]);

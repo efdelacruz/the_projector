@@ -49,8 +49,8 @@ class ProjectAssignmentsController extends Controller
    */
   public function assignPersonToProject(Request $request)
   {
-    //if ($request->isXmlHttpRequest())
-    //{
+    if ($request->isXmlHttpRequest())
+    {
       $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
@@ -62,7 +62,7 @@ class ProjectAssignmentsController extends Controller
         'success'=>true,
         'status'=>200
       )));
-    //}
+    }
   }
 
   /**
@@ -70,8 +70,8 @@ class ProjectAssignmentsController extends Controller
    */
   public function unassignPersonFromProject(Request $request)
   {
-    //if ($request->isXmlHttpRequest())
-    //{
+    if ($request->isXmlHttpRequest())
+    {
       $project_id = $request->request->get('project_id');
       $person_id = $request->request->get('person_id');
       $conn = $this->get('database_connection');
@@ -83,6 +83,6 @@ class ProjectAssignmentsController extends Controller
         'success'=>true,
         'status'=>200
       )));
-    //}
+    }
   }
 }
